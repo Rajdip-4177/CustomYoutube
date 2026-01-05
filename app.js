@@ -482,10 +482,12 @@ function createFilters() {
   activeFilters.add('all');
   filtersContainer.appendChild(allChip);
 
-  // Add category filters
+  // Add individual channel filters
   channelsData.forEach(category => {
-    const chip = createFilterChip(category.name, category.name);
-    filtersContainer.appendChild(chip);
+    category.channels.forEach(channel => {
+      const chip = createFilterChip(channel.displayName, channel.id);
+      filtersContainer.appendChild(chip);
+    });
   });
 }
 
@@ -563,22 +565,12 @@ async function performSearch(query) {
 }
 
 function getFilteredChannelIds() {
-  let channels = [];
-
   if (activeFilters.has('all')) {
-    channels = channelsData.flatMap(cat => cat.channels);
-  } else {
-    channelsData.forEach(category => {
-      if (activeFilters.has(category.name)) {
-        channels.push(...category.channels);
-      }
-    });
+    return channelsData.flatMap(cat => cat.channels).map(ch => ch.id).filter(id => id);
   }
 
-  // Use hardcoded IDs directly from channel objects
-  return channels
-    .map(ch => ch.id)
-    .filter(id => id); // Filter out any missing IDs
+  // Active filters contains specific channel IDs
+  return Array.from(activeFilters);
 }
 
 async function searchChannel(channelId, query) {
