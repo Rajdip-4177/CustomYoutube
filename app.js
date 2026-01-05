@@ -197,6 +197,7 @@ function populateCategoryDropdown() {
 // Initialize UI
 function initializeUI() {
   const searchSection = document.getElementById('searchSection');
+  initQuotaTracker(); // Initialize tracker
   if (!apiKey) {
     searchSection.style.opacity = '0.5';
     searchSection.style.pointerEvents = 'none';
@@ -382,13 +383,16 @@ function saveApiKey() {
 function updateAPIStatus(active) {
   const indicator = document.getElementById('statusIndicator');
   const text = document.getElementById('statusText');
+  const quotaContainer = document.getElementById('quotaContainer');
 
   if (active) {
     indicator.classList.add('active');
     text.textContent = 'API key configured ✓';
+    if (quotaContainer) quotaContainer.style.display = 'block';
   } else {
     indicator.classList.remove('active');
     text.textContent = 'No API key set';
+    if (quotaContainer) quotaContainer.style.display = 'none';
   }
 }
 
@@ -577,6 +581,8 @@ async function searchChannel(channelId, query) {
   // Use maxResults=20 to ensure we have enough videos after filtering Shorts
   const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&q=${encodeURIComponent(query)}&type=video&maxResults=20&order=relevance&key=${apiKey}`;
 
+  updateQuota(100); // 100 units for search.list
+
   try {
     const response = await fetch(url);
     const data = await response.json();
@@ -606,6 +612,8 @@ async function filterShorts(videos) {
 
   const videoIds = videos.map(v => v.videoId).join(',');
   const url = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds}&key=${apiKey}`;
+
+  updateQuota(1); // 1 unit for videos.list
 
   try {
     const response = await fetch(url);
@@ -758,4 +766,60 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// Quota Tracker Functions
+function initQuotaTracker() {
+  resetQuotaIfNeeded();
+  updateQuotaUI();
+
+  // Show if API key exists
+  if (apiKey) {
+    const qc = document.getElementById('quotaContainer');
+    if (qc) qc.style.display = 'block';
+  }
+}
+
+function resetQuotaIfNeeded() {
+  const today = new Date().toDateString();
+  const stored = JSON.parse(localStorage.getItem('quotaTracker') || '{}');
+
+  if (stored.date !== today) {
+    localStorage.setItem('quotaTracker', JSON.stringify({
+      date: today,
+      used: 0
+    }));
+  }
+}
+
+function updateQuota(cost) {
+  resetQuotaIfNeeded();
+  const stored = JSON.parse(localStorage.getItem('quotaTracker') || '{"used":0, "date":""}');
+  stored.used = (stored.used || 0) + cost;
+  localStorage.setItem('quotaTracker', JSON.stringify(stored));
+  updateQuotaUI();
+}
+
+function updateQuotaUI() {
+  const stored = JSON.parse(localStorage.getItem('quotaTracker') || '{"used":0}');
+  const used = stored.used || 0;
+  const limit = 10000;
+  const percentage = Math.min((used / limit) * 100, 100);
+
+  const fill = document.getElementById('quotaFill');
+  const text = document.getElementById('quotaText');
+
+  if (fill && text) {
+    fill.style.width = `${percentage}%`;
+    text.textContent = `${used.toLocaleString()} / ${limit.toLocaleString()}`;
+
+    // Color change based on usage
+    if (percentage > 90) {
+      fill.style.background = '#f44336'; // Red
+    } else if (percentage > 70) {
+      fill.style.background = '#ff9800'; // Orange
+    } else {
+      fill.style.background = 'linear-gradient(90deg, #4CAF50, #8BC34A)'; // Green
+    }
+  }
 }
