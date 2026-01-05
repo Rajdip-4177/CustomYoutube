@@ -1,0 +1,119 @@
+{
+  "categories": [
+    {
+      "name": "Class 9",
+      "channels": [
+        {
+          "handle": "Class9-NEEV",
+          "displayName": "Class 9 - NEEV",
+          "url": "https://youtube.com/@Class9-NEEV"
+        }
+      ]
+    },
+    {
+      "name": "Class 10",
+      "channels": [
+        {
+          "handle": "Class10-UDAAN",
+          "displayName": "Class 10 - UDAAN",
+          "url": "https://youtube.com/@Class10-UDAAN"
+        },
+        {
+          "handle": "PWICSE",
+          "displayName": "PW ICSE",
+          "url": "https://youtube.com/@PWICSE"
+        }
+      ]
+    },
+    {
+      "name": "Class 11 - JEE",
+      "channels": [
+        {
+          "handle": "Class11th-JEE",
+          "displayName": "Class 11th JEE",
+          "url": "https://youtube.com/@Class11th-JEE"
+        }
+      ]
+    },
+    {
+      "name": "Class 11 - NEET",
+      "channels": [
+        {
+          "handle": "Class11th-NEET",
+          "displayName": "Class 11th NEET",
+          "url": "https://youtube.com/@Class11th-NEET"
+        }
+      ]
+    },
+    {
+      "name": "Class 12 - JEE",
+      "channels": [
+        {
+          "handle": "Class12th-JEE",
+          "displayName": "Class 12th JEE",
+          "url": "https://youtube.com/@Class12th-JEE"
+        },
+        {
+          "handle": "PW-JEEWallah",
+          "displayName": "PW JEE Wallah",
+          "url": "https://youtube.com/@PW-JEEWallah"
+        }
+      ]
+    },
+    {
+      "name": "Class 12 - NEET",
+      "channels": [
+        {
+          "handle": "Class12th-NEET",
+          "displayName": "Class 12th NEET",
+          "url": "https://youtube.com/@Class12th-NEET"
+        }
+      ]
+    },
+    {
+      "name": "Droppers",
+      "channels": [
+        {
+          "handle": "PW-JEEWallah",
+          "displayName": "PW JEE Wallah",
+          "url": "https://youtube.com/@PW-JEEWallah"
+        },
+        {
+          "handle": "Yakeen",
+          "displayName": "Yakeen",
+          "url": "https://youtube.com/@Yakeen"
+        }
+      ]
+    },
+    {
+      "name": "Support Channels",
+      "channels": [
+        {
+          "handle": "NCERTWallah",
+          "displayName": "NCERT Wallah",
+          "url": "https://youtube.com/@NCERTWallah"
+        },
+        {
+          "handle": "JEEChallengersbyPW",
+          "displayName": "JEE Challengers by PW",
+          "url": "https://youtube.com/@JEEChallengersbyPW"
+        },
+        {
+          "handle": "PW-Foundation",
+          "displayName": "PW Foundation",
+          "url": "https://youtube.com/@PW-Foundation"
+        },
+        {
+          "handle": "PhysicsWallah",
+          "displayName": "Physics Wallah",
+          "url": "https://youtube.com/@PhysicsWallah"
+        },
+        {
+          "handle": "PW-NEETWallah",
+          "displayName": "PW NEET Wallah",
+          "url": "https://youtube.com/@PW-NEETWallah"
+        }
+      ]
+    }
+  ]
+}

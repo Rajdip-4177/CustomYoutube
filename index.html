@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Focused YouTube search for curated educational channels - Physics Wallah. Stay distraction-free while learning.">
+  <title>Focused Learning Hub - Physics Wallah Channels</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1 class="logo">📚 Focused Learning Hub</h1>
+      <p class="tagline">Your Distraction-Free Gateway to Physics Wallah</p>
+    </header>
+
+    <!-- API Key Section -->
+    <section class="api-key-section" id="apiKeySection">
+      <div class="api-key-input-group">
+        <input type="text" id="apiKeyInput" placeholder="Enter your YouTube API Key" autocomplete="off">
+        <button class="btn btn-primary" id="saveApiKeyBtn">Save Key</button>
+        <button class="btn btn-secondary" id="showInstructionsBtn">How to get API Key?</button>
+        <button class="btn btn-secondary" id="addChannelBtn">Add Channel</button>
+      </div>
+      <div class="api-status">
+        <span class="status-indicator" id="statusIndicator"></span>
+        <span id="statusText">No API key set</span>
+      </div>
+    </section>
+
+    <!-- Search Section -->
+    <section class="search-section" id="searchSection">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search videos from your curated channels..."
+          autocomplete="off">
+      </div>
+      <div class="search-filters" id="searchFilters">
+        <!-- Filters will be populated by JavaScript -->
+      </div>
+    </section>
+
+    <!-- Video Results -->
+    <section class="results-section hidden" id="resultsSection">
+      <h2 class="section-title">Search Results</h2>
+      <div class="results-info" id="resultsInfo"></div>
+      <div class="videos-grid" id="videosGrid">
+        <!-- Videos will be populated by JavaScript -->
+      </div>
+    </section>
+
+    <!-- Channels Section -->
+    <section class="channels-section" id="channelsSection">
+      <h2 class="section-title">Quick Access to Channels</h2>
+      <div id="categoriesContainer">
+        <!-- Categories and channels will be populated by JavaScript -->
+      </div>
+    </section>
+  </div>
+
+  <!-- API Instructions Modal -->
+  <div class="modal" id="instructionsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Get Your YouTube API Key</h2>
+        <button class="close-btn" id="closeModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>To use this application, you need a free YouTube Data API v3 key. Follow these steps:</p>
+
+        <h3>Step 1: Go to Google Cloud Console</h3>
+        <ol>
+          <li>Visit <a href="https://console.cloud.google.com/" target="_blank" style="color: var(--primary);">Google
+              Cloud Console</a></li>
+          <li>Sign in with your Google account</li>
+        </ol>
+
+        <h3>Step 2: Create a Project</h3>
+        <ol>
+          <li>Click on the project dropdown at the top</li>
+          <li>Click "New Project"</li>
+          <li>Name it (e.g., "YouTube Search App") and click "Create"</li>
+        </ol>
+
+        <h3>Step 3: Enable YouTube Data API</h3>
+        <ol>
+          <li>In the search bar, type "YouTube Data API v3"</li>
+          <li>Click on it and press "Enable"</li>
+        </ol>
+
+        <h3>Step 4: Create API Key</h3>
+        <ol>
+          <li>Go to "Credentials" in the left sidebar</li>
+          <li>Click "Create Credentials" → "API Key"</li>
+          <li>Copy the generated API key</li>
+          <li>Paste it in the input field above</li>
+        </ol>
+
+        <h3>Step 5: (Optional) Restrict Your Key</h3>
+        <ol>
+          <li>Click "Restrict Key" for security</li>
+          <li>Under "API restrictions", select "YouTube Data API v3"</li>
+          <li>Save your changes</li>
+        </ol>
+
+        <p style="margin-top: 1.5rem;"><strong>Note:</strong> The free tier includes 10,000 quota units per day, which
+          is more than enough for personal use. Your API key is stored locally in your browser and never sent anywhere
+          except to YouTube.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Channel Modal -->
+  <div class="modal" id="addChannelModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Add New Channel</h2>
+        <button class="close-btn" id="closeAddChannelModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+          <label for="channelUrl" style="display: block; margin-bottom: 0.5rem; color: var(--text-primary);">Channel
+            Link</label>
+          <input type="text" id="channelUrl" placeholder="https://youtube.com/@handle"
+            style="width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 0.5rem; margin-bottom: 1rem; background: var(--bg-primary); color: var(--text-primary); border-color: rgba(255,255,255,0.1);">
+        </div>
+        <div class="input-group">
+          <label for="channelCategory"
+            style="display: block; margin-bottom: 0.5rem; color: var(--text-primary);">Category</label>
+          <select id="channelCategory"
+            style="width: 100%; padding: 0.8rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; margin-bottom: 1.5rem; background: var(--bg-primary); color: var(--text-primary);">
+            <!-- Options populated by JS -->
+          </select>
+        </div>
+        <button class="btn btn-primary" id="confirmAddChannelBtn" style="width: 100%;">Add Channel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
