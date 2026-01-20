@@ -15,144 +15,31 @@ let extensionDataReceived = false;
 let expandedCategories = new Set(); // Track which folders are open
 let channelDetailsCache = JSON.parse(localStorage.getItem('channelDetailsCache') || '{}'); // Cache channel profile info
 
-// Embedded Channel Data with hardcoded IDs (to avoid quota exhaustion)
-const CHANNELS_DATA = {
-  "categories": [
-    {
-      "name": "Class 9",
-      "channels": [
-        {
-          "id": "UCVs9oKvZbUe0Mq9zBL62ZSw",
-          "handle": "Class9-NEEV",
-          "displayName": "Class 9 - NEEV",
-          "url": "https://youtube.com/@Class9-NEEV"
-        }
-      ]
-    },
-    {
-      "name": "Class 10",
-      "channels": [
-        {
-          "id": "UCwCloZGOqRB_JHtgDKKJZbw",
-          "handle": "Class10-UDAAN",
-          "displayName": "Class 10 - UDAAN",
-          "url": "https://youtube.com/@Class10-UDAAN"
-        },
-        {
-          "id": "UCPqeXfZxstA5RzIP4OjuAKw",
-          "handle": "PWICSE",
-          "displayName": "PW ICSE",
-          "url": "https://youtube.com/@PWICSE"
-        }
-      ]
-    },
-    {
-      "name": "Class 11 - JEE",
-      "channels": [
-        {
-          "id": "UCctEsQirgs3hCmq5S7A7ToA",
-          "handle": "Class11th-JEE",
-          "displayName": "Class 11th JEE",
-          "url": "https://youtube.com/@Class11th-JEE"
-        }
-      ]
-    },
-    {
-      "name": "Class 11 - NEET",
-      "channels": [
-        {
-          "id": "UCWEmndu9aCunQAVCjxsP7jg",
-          "handle": "Class11th-NEET",
-          "displayName": "Class 11th NEET",
-          "url": "https://youtube.com/@Class11th-NEET"
-        }
-      ]
-    },
-    {
-      "name": "Class 12 - JEE",
-      "channels": [
-        {
-          "id": "UChbgwNStwEW8CdeuRl-JaXQ",
-          "handle": "Class12th-JEE",
-          "displayName": "Class 12th JEE",
-          "url": "https://youtube.com/@Class12th-JEE"
-        },
-        {
-          "id": "UCVJU_IChPMOe8RWkdVQjtfQ",
-          "handle": "PW-JEEWallah",
-          "displayName": "PW JEE Wallah",
-          "url": "https://youtube.com/@PW-JEEWallah"
-        }
-      ]
-    },
-    {
-      "name": "Class 12 - NEET",
-      "channels": [
-        {
-          "id": "UC2ynjdzhmROVYmDaF1KrvEA",
-          "handle": "Class12th-NEET",
-          "displayName": "Class 12th NEET",
-          "url": "https://youtube.com/@Class12th-NEET"
-        }
-      ]
-    },
-    {
-      "name": "Droppers",
-      "channels": [
-        {
-          "id": "UCVJU_IChPMOe8RWkdVQjtfQ",
-          "handle": "PW-JEEWallah",
-          "displayName": "PW JEE Wallah",
-          "url": "https://youtube.com/@PW-JEEWallah"
-        },
-        {
-          "id": "UCUy0Nar2ZTQwZBUSliqaioQ",
-          "handle": "Yakeen",
-          "displayName": "Yakeen",
-          "url": "https://youtube.com/@Yakeen"
-        }
-      ]
-    },
-    {
-      "name": "Support Channels",
-      "channels": [
-        {
-          "id": "UCCJs3LCIxNidjfbCksySd-g",
-          "handle": "NCERTWallah",
-          "displayName": "NCERT Wallah",
-          "url": "https://youtube.com/@NCERTWallah"
-        },
-        {
-          "id": "UCyf71tWV2abeN-l_UKiJ-5g",
-          "handle": "JEEChallengersbyPW",
-          "displayName": "JEE Challengers by PW",
-          "url": "https://youtube.com/@JEEChallengersbyPW"
-        },
-        {
-          "id": "UCphU2bAGmw304CFAzy0Enuw",
-          "handle": "PW-Foundation",
-          "displayName": "PW Foundation",
-          "url": "https://youtube.com/@PW-Foundation"
-        },
-        {
-          "id": "UCiGyWN6DEbnj2alu7iapuKQ",
-          "handle": "PhysicsWallah",
-          "displayName": "Physics Wallah",
-          "url": "https://youtube.com/@PhysicsWallah"
-        },
-        {
-          "id": "UCD16eo98AXl-9T61Xd711kQ",
-          "handle": "PW-NEETWallah",
-          "displayName": "PW NEET Wallah",
-          "url": "https://youtube.com/@PW-NEETWallah"
-        }
-      ]
+// Channel Data (loaded from config.json)
+let CHANNELS_DATA = { categories: [] };
+
+// Load configuration from external file
+async function loadConfig() {
+  try {
+    const response = await fetch('config.json');
+    if (response.ok) {
+      const config = await response.json();
+      CHANNELS_DATA = config;
+      console.log('Config loaded successfully:', CHANNELS_DATA.categories.length, 'categories');
+    } else {
+      console.warn('config.json not found, using empty configuration');
     }
-  ]
-};
+  } catch (error) {
+    console.warn('Failed to load config.json:', error.message);
+    console.log('App will start with empty channel list. Add channels via "Add Channel" button.');
+  }
+}
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', async () => {
+  // Load configuration first
+  await loadConfig();
+
   // Check if running under extension
   if (window.FOCUSED_LEARNING_HUB_EXTENSION) {
     console.log('Extension detected - requesting data...');
