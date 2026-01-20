@@ -1,7 +1,5 @@
 // Popup Logic - Firebase Auth & UI Management
-
-// Import Firebase config
-import { firebaseConfig } from '../lib/firebase-init.js';
+// Note: Firebase integration will be added once user provides credentials
 
 // State management
 let currentUser = null;
@@ -24,9 +22,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Initialize Firebase Auth
 async function initializeAuth() {
-    // Firebase SDK is loaded via CDN (add to popup.html)
-    // For now, using placeholder
-    console.log('Firebase would be initialized here with config:', firebaseConfig);
+    // TODO: Firebase SDK will be initialized here once user provides credentials
+    // For now, this is a placeholder
+    console.log('Firebase initialization would happen here once credentials are provided');
 }
 
 // Load user state from storage

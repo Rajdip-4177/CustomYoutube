@@ -1,6 +1,5 @@
 // Background Service Worker (Manifest V3)
-import { initializeFirebase, getCurrentUser } from './lib/firebase-init.js';
-import { syncDataFromSupabase } from './lib/supabase-sync.js';
+// Note: Firebase integration will be added once user provides credentials
 
 console.log('Focused Learning Hub - Background Service Worker initialized');
 
@@ -62,22 +61,13 @@ async function handleUserLogin(user) {
 // Sync data from Supabase to local storage
 async function syncUserData(user) {
     try {
-        const data = await syncDataFromSupabase(user);
+        // TODO: Import and use syncDataFromSupabase once Firebase credentials are added
+        console.log('Sync would happen here once Supabase credentials are configured');
 
-        if (data) {
-            await chrome.storage.local.set({
-                youtube_api_key: data.youtube_api_key,
-                whitelist_channels: data.whitelist_channels || [],
-                lastSync: new Date().toISOString()
-            });
+        // For now, just log
+        console.log('syncUserData called for user:', user?.uid);
 
-            console.log('Data synced successfully', {
-                hasApiKey: !!data.youtube_api_key,
-                channelCount: data.whitelist_channels?.length || 0
-            });
-
-            return { success: true };
-        }
+        return { success: true, message: 'Sync not yet configured' };
     } catch (error) {
         console.error('Sync error:', error);
         return { success: false, error: error.message };
