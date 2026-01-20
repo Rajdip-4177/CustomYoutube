@@ -7,7 +7,10 @@
   <meta name="description"
     content="Focused YouTube search for curated educational channels - Physics Wallah. Stay distraction-free while learning.">
   <title>Focused Learning Hub - Physics Wallah Channels</title>
-  <link rel="icon" type="image/png" href="Favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="Favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="Favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="Favicon.png">
+  <link rel="shortcut icon" href="Favicon.png">
   <link rel="stylesheet" href="style.css">
   <!-- Feather Icons -->
   <script src="https://unpkg.com/feather-icons"></script>
@@ -21,19 +24,17 @@
         <span class="logo-icon">📚</span>
         <h1 class="logo-text">Focused Learning Hub</h1>
       </div>
-
-      <!-- Search Bar -->
-      <div class="header-search">
-        <i data-feather="search"></i>
-        <input type="text" id="searchInput" placeholder="Search videos from your curated channels..."
-          autocomplete="off">
-      </div>
     </div>
   </header>
 
   <div class="app-container">
+    <!-- Sidebar Toggle -->
+    <button class="sidebar-toggle" id="sidebarToggle" title="Toggle Sidebar">
+      <i data-feather="menu"></i>
+    </button>
+
     <!-- Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <!-- User Section -->
       <div class="sidebar-section user-section">
         <div id="userCard" class="user-card">
@@ -112,6 +113,13 @@
 
     <!-- Main Content -->
     <main class="main-content">
+      <!-- Search Panel -->
+      <div class="search-panel">
+        <i data-feather="search"></i>
+        <input type="text" id="searchInput" placeholder="Search videos from your curated channels..."
+          autocomplete="off">
+      </div>
+
       <!-- Search Results -->
       <section id="resultsSection" class="results-section hidden">
         <div class="section-title-bar">
