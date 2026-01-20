@@ -1,0 +1,94 @@
+[
+    {
+        "id": 1,
+        "priority": 2,
+        "action": {
+            "type": "allow"
+        },
+        "condition": {
+            "urlFilter": "*://www.youtube.com/embed/*",
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame"
+            ]
+        }
+    },
+    {
+        "id": 2,
+        "priority": 2,
+        "action": {
+            "type": "allow"
+        },
+        "condition": {
+            "urlFilter": "*://m.youtube.com/embed/*",
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame"
+            ]
+        }
+    },
+    {
+        "id": 3,
+        "priority": 2,
+        "action": {
+            "type": "allow"
+        },
+        "condition": {
+            "urlFilter": "*://www.googleapis.com/*",
+            "resourceTypes": [
+                "xmlhttprequest"
+            ]
+        }
+    },
+    {
+        "id": 4,
+        "priority": 1,
+        "action": {
+            "type": "redirect",
+            "redirect": {
+                "url": "https://rajdip-4177.github.io/CustomYoutube/"
+            }
+        },
+        "condition": {
+            "urlFilter": "*://www.youtube.com/*",
+            "resourceTypes": [
+                "main_frame"
+            ],
+            "excludedUrlFilter": "*://www.youtube.com/embed/*"
+        }
+    },
+    {
+        "id": 5,
+        "priority": 1,
+        "action": {
+            "type": "redirect",
+            "redirect": {
+                "url": "https://rajdip-4177.github.io/CustomYoutube/"
+            }
+        },
+        "condition": {
+            "urlFilter": "*://youtube.com/*",
+            "resourceTypes": [
+                "main_frame"
+            ],
+            "excludedUrlFilter": "*://youtube.com/embed/*"
+        }
+    },
+    {
+        "id": 6,
+        "priority": 1,
+        "action": {
+            "type": "redirect",
+            "redirect": {
+                "url": "https://rajdip-4177.github.io/CustomYoutube/"
+            }
+        },
+        "condition": {
+            "urlFilter": "*://m.youtube.com/*",
+            "resourceTypes": [
+                "main_frame"
+            ],
+            "excludedUrlFilter": "*://m.youtube.com/embed/*"
+        }
+    }
+]

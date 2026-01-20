@@ -7,6 +7,10 @@ let activeFilters = new Set();
 let hiddenChannels = JSON.parse(localStorage.getItem('hiddenChannels') || '[]'); // Hidden channel IDs
 let channelToDelete = null; // Temp storage for delete confirmation
 
+// Extension Integration
+let extensionMode = false; // Will be set to true if extension is detected
+let extensionDataReceived = false;
+
 // Embedded Channel Data with hardcoded IDs (to avoid quota exhaustion)
 const CHANNELS_DATA = {
   "categories": [
@@ -145,6 +149,13 @@ const CHANNELS_DATA = {
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', async () => {
+  // Check if running under extension
+  if (window.FOCUSED_LEARNING_HUB_EXTENSION) {
+    console.log('Extension detected - requesting data...');
+    extensionMode = true;
+    requestExtensionData();
+  }
+
   loadChannelsData();
   initializeUI();
   setupEventListeners();
@@ -152,6 +163,50 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (apiKey) {
     document.getElementById('apiKeyInput').value = apiKey;
     updateAPIStatus(true);
+  }
+});
+
+// Request data from extension (if present)
+function requestExtensionData() {
+  // Send request to content script
+  window.postMessage({ type: 'REQUEST_EXTENSION_DATA' }, '*');
+
+  // Set timeout in case extension doesn't respond
+  setTimeout(() => {
+    if (!extensionDataReceived) {
+      console.warn('Extension did not respond - using local storage fallback');
+    }
+  }, 2000);
+}
+
+// Listen for extension data response
+window.addEventListener('message', (event) => {
+  if (event.data.type === 'EXTENSION_DATA_RESPONSE') {
+    extensionDataReceived = true;
+    const { youtube_api_key, whitelist_channels, isLoggedIn, userEmail } = event.data.data;
+
+    console.log('Received data from extension:', {
+      hasApiKey: !!youtube_api_key,
+      channelCount: whitelist_channels?.length || 0,
+      isLoggedIn
+    });
+
+    // Use extension data if available
+    if (youtube_api_key) {
+      apiKey = youtube_api_key;
+      localStorage.setItem('youtubeApiKey', apiKey);
+      document.getElementById('apiKeyInput').value = apiKey;
+      updateAPIStatus(true);
+    }
+
+    // Show extension status in UI
+    if (isLoggedIn && userEmail) {
+      const apiSection = document.getElementById('apiKeySection');
+      const extensionBadge = document.createElement('div');
+      extensionBadge.style.cssText = 'background: linear-gradient(135deg, #10b981, #34d399); color: white; padding: 8px 12px; border-radius: 6px; margin-top: 8px; font-size: 0.85rem; text-align: center;';
+      extensionBadge.innerHTML = `✓ Connected to Extension | ${userEmail}`;
+      apiSection.appendChild(extensionBadge);
+    }
   }
 });
 

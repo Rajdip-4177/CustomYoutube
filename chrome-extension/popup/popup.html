@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focused Learning Hub</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+    <div class="popup-container">
+        <!-- Loading State -->
+        <div id="loadingState" class="state">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+
+        <!-- Not Logged In State -->
+        <div id="notLoggedInState" class="state hidden">
+            <div class="logo">📚</div>
+            <h2>Focused Learning Hub</h2>
+            <p class="subtitle">Stay focused on educational content</p>
+
+            <button id="googleSignInBtn" class="btn btn-primary">
+                <span class="google-icon">G</span>
+                Sign in with Google
+            </button>
+
+            <div class="info-box">
+                <p><strong>Note:</strong> This extension blocks YouTube and redirects you to a focused portal with
+                    whitelisted educational channels.</p>
+            </div>
+        </div>
+
+        <!-- Logged In State -->
+        <div id="loggedInState" class="state hidden">
+            <div class="header">
+                <div class="user-info">
+                    <img id="userAvatar" src="" alt="Avatar" class="avatar">
+                    <div>
+                        <div id="userName" class="user-name"></div>
+                        <div id="userEmail" class="user-email"></div>
+                    </div>
+                </div>
+                <button id="logoutBtn" class="btn-text">Logout</button>
+            </div>
+
+            <div class="section">
+                <h3>YouTube API Key</h3>
+                <div class="api-key-box">
+                    <input type="text" id="apiKeyInput" placeholder="Paste your YouTube API Key" class="input">
+                    <button id="saveApiKeyBtn" class="btn btn-secondary">Save</button>
+                </div>
+                <p class="hint">Your key is synced across all devices</p>
+            </div>
+
+            <div class="section">
+                <h3>Sync Status</h3>
+                <div class="sync-status">
+                    <div id="syncIndicator" class="status-dot"></div>
+                    <span id="syncText">Checking...</span>
+                    <button id="syncNowBtn" class="btn-icon" title="Sync now">🔄</button>
+                </div>
+                <p class="hint" id="lastSyncTime">Last synced: Never</p>
+            </div>
+
+            <div class="section">
+                <h3>Whitelist Stats</h3>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="channelCount">0</div>
+                        <div class="stat-label">Channels</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <button id="openPortalBtn" class="btn btn-primary" style="width: 100%;">
+                    Open Learning Portal
+                </button>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="state hidden">
+            <div class="error-icon">⚠️</div>
+            <h3>Something went wrong</h3>
+            <p id="errorMessage"></p>
+            <button id="retryBtn" class="btn btn-secondary">Retry</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module" src="popup.js"></script>
+</body>
+
+</html>
