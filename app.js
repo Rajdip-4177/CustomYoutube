@@ -4,6 +4,8 @@ let channelsData = [];
 let customChannels = JSON.parse(localStorage.getItem('customChannels') || '[]');
 let channelIdCache = JSON.parse(localStorage.getItem('channelIdCache') || '{}'); // Persist cache
 let activeFilters = new Set();
+let hiddenChannels = JSON.parse(localStorage.getItem('hiddenChannels') || '[]'); // Hidden channel IDs
+let channelToDelete = null; // Temp storage for delete confirmation
 
 // Embedded Channel Data with hardcoded IDs (to avoid quota exhaustion)
 const CHANNELS_DATA = {
@@ -172,6 +174,11 @@ function loadChannelsData() {
     }
   });
 
+  // Filter out hidden channels
+  staticData.forEach(category => {
+    category.channels = category.channels.filter(ch => !hiddenChannels.includes(ch.id));
+  });
+
   channelsData = staticData;
   displayChannels();
   createFilters();
@@ -179,27 +186,47 @@ function loadChannelsData() {
 }
 
 // Delete Channel
-function deleteChannel(channelId, categoryName) {
-  // Find the channel to get its name for confirmation
-  const channelToDelete = customChannels.find(ch => ch.id === channelId);
+function deleteChannel(channelId, channelName) {
+  channelToDelete = { id: channelId, name: channelName };
 
-  if (!channelToDelete) {
-    console.error('Channel not found');
-    return;
-  }
+  // Show custom confirmation modal
+  const modal = document.getElementById('deleteConfirmModal');
+  const message = document.getElementById('deleteConfirmMessage');
+  message.textContent = `Are you sure you want to remove "${channelName}"? You can always add it back later.`;
+  modal.classList.add('active');
+}
 
-  const confirmMessage = `Are you sure you want to remove "${channelToDelete.displayName}"?`;
+function confirmDelete() {
+  if (!channelToDelete) return;
 
-  if (confirm(confirmMessage)) {
-    // Remove from customChannels array
-    customChannels = customChannels.filter(ch => ch.id !== channelId);
+  // Check if it's a custom channel
+  const isCustom = customChannels.some(ch => ch.id === channelToDelete.id);
 
-    // Update localStorage
+  if (isCustom) {
+    // Remove from customChannels
+    customChannels = customChannels.filter(ch => ch.id !== channelToDelete.id);
     localStorage.setItem('customChannels', JSON.stringify(customChannels));
-
-    // Reload data to refresh UI
-    loadChannelsData();
+  } else {
+    // Add to hidden channels
+    if (!hiddenChannels.includes(channelToDelete.id)) {
+      hiddenChannels.push(channelToDelete.id);
+      localStorage.setItem('hiddenChannels', JSON.stringify(hiddenChannels));
+    }
   }
+
+  // Close modal
+  closeDeleteModal();
+
+  // Reload UI
+  loadChannelsData();
+
+  channelToDelete = null;
+}
+
+function closeDeleteModal() {
+  const modal = document.getElementById('deleteConfirmModal');
+  modal.classList.remove('active');
+  channelToDelete = null;
 }
 
 
@@ -247,23 +274,19 @@ function setupEventListeners() {
   });
   document.getElementById('confirmAddChannelBtn').addEventListener('click', handleAddChannel);
 
-  // Search
-  const searchInput = document.getElementById('searchInput');
-  let searchTimeout;
-  searchInput.addEventListener('input', (e) => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
-      if (e.target.value.trim()) {
-        performSearch(e.target.value.trim());
-      } else {
-        hideResults();
-      }
-    }, 500);
+  // Delete Confirmation Modal
+  document.getElementById('closeDeleteModalBtn').addEventListener('click', closeDeleteModal);
+  document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
+  document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDelete);
+  document.getElementById('deleteConfirmModal').addEventListener('click', (e) => {
+    if (e.target.id === 'deleteConfirmModal') closeDeleteModal();
   });
+
+  // Search - Only trigger on Enter key
+  const searchInput = document.getElementById('searchInput');
 
   searchInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter' && e.target.value.trim()) {
-      clearTimeout(searchTimeout);
       performSearch(e.target.value.trim());
     }
   });
@@ -492,22 +515,20 @@ function displayChannels() {
         <div class="channel-handle">@${channel.handle}</div>
       `;
 
-      // Add delete button for custom channels only
-      if (channel.isCustom) {
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'channel-delete-btn';
-        deleteBtn.innerHTML = '🗑️';
-        deleteBtn.title = 'Remove channel';
-        deleteBtn.setAttribute('aria-label', 'Delete channel');
+      // Add delete button to ALL channels
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'channel-delete-btn';
+      deleteBtn.innerHTML = '🗑️';
+      deleteBtn.title = 'Remove channel';
+      deleteBtn.setAttribute('aria-label', 'Delete channel');
 
-        deleteBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          deleteChannel(channel.id, category.name);
-        });
+      deleteBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        deleteChannel(channel.id, channel.displayName);
+      });
 
-        channelCard.appendChild(deleteBtn);
-      }
+      channelCard.appendChild(deleteBtn);
 
       channelsGrid.appendChild(channelCard);
     });
