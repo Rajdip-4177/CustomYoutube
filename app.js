@@ -11,6 +11,10 @@ let channelToDelete = null; // Temp storage for delete confirmation
 let extensionMode = false; // Will be set to true if extension is detected
 let extensionDataReceived = false;
 
+// UI State
+let expandedCategories = new Set(); // Track which folders are open
+let channelDetailsCache = JSON.parse(localStorage.getItem('channelDetailsCache') || '{}'); // Cache channel profile info
+
 // Embedded Channel Data with hardcoded IDs (to avoid quota exhaustion)
 const CHANNELS_DATA = {
   "categories": [
@@ -540,57 +544,191 @@ async function getChannelIdFromHandle(handle) {
   return null;
 }
 
-// Display Channels
-function displayChannels() {
+// Fetch Channel Details from YouTube API
+async function fetchChannelDetails(channelId) {
+  // Check cache first
+  if (channelDetailsCache[channelId]) {
+    return channelDetailsCache[channelId];
+  }
+
+  if (!apiKey) {
+    return null;
+  }
+
+  try {
+    updateQuota(1); // 1 unit for channels.list
+
+    const url = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${channelId}&key=${apiKey}`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.items && data.items.length > 0) {
+      const channel = data.items[0];
+      const details = {
+        thumbnail: channel.snippet.thumbnails.medium?.url || channel.snippet.thumbnails.default?.url,
+        description: channel.snippet.description,
+        subscriberCount: channel.statistics.subscriberCount,
+        videoCount: channel.statistics.videoCount
+      };
+
+      // Cache it
+      channelDetailsCache[channelId] = details;
+      localStorage.setItem('channelDetailsCache', JSON.stringify(channelDetailsCache));
+
+      return details;
+    }
+  } catch (error) {
+    console.error(`Error fetching channel details for ${channelId}:`, error);
+  }
+
+  return null;
+}
+
+// Format large numbers
+function formatNumber(num) {
+  if (!num) return '0';
+  const n = parseInt(num);
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+  return n.toString();
+}
+
+// Toggle Category Folder
+function toggleCategory(categoryName) {
+  if (expandedCategories.has(categoryName)) {
+    expandedCategories.delete(categoryName);
+  } else {
+    expandedCategories.add(categoryName);
+  }
+  displayChannels();
+}
+
+// Display Channels (New Folder-Style UI)
+async function displayChannels() {
   const container = document.getElementById('categoriesContainer');
   container.innerHTML = '';
 
-  channelsData.forEach(category => {
-    const categoryDiv = document.createElement('div');
-    categoryDiv.className = 'category';
+  let totalChannelCount = 0;
 
-    const categoryTitle = document.createElement('h3');
-    categoryTitle.className = 'category-title';
-    categoryTitle.textContent = category.name;
-    categoryDiv.appendChild(categoryTitle);
+  for (const category of channelsData) {
+    if (category.channels.length === 0) continue; // Skip empty categories
 
-    const channelsGrid = document.createElement('div');
-    channelsGrid.className = 'channels-grid';
+    const isExpanded = expandedCategories.has(category.name);
+    totalChannelCount += category.channels.length;
 
-    category.channels.forEach(channel => {
-      const channelCard = document.createElement('a');
-      channelCard.className = 'channel-card';
-      channelCard.href = channel.url;
-      channelCard.target = '_blank';
-      channelCard.rel = 'noopener noreferrer';
+    // Create folder
+    const folderDiv = document.createElement('div');
+    folderDiv.className = `category-folder ${isExpanded ? 'expanded' : ''}`;
 
-      channelCard.innerHTML = `
-        <div class="channel-icon">📺</div>
+    // Folder header
+    const folderHeader = document.createElement('div');
+    folderHeader.className = 'category-header';
+    folderHeader.addEventListener('click', () => toggleCategory(category.name));
+
+    folderHeader.innerHTML = `
+      <span class="category-icon">${isExpanded ? '📂' : '📁'}</span>
+      <h3 class="category-title">${category.name}</h3>
+      <span class="category-badge">${category.channels.length}</span>
+    `;
+
+    folderDiv.appendChild(folderHeader);
+
+    // Folder content
+    const folderContent = document.createElement('div');
+    folderContent.className = 'category-content';
+
+    if (isExpanded) {
+      const channelsGrid = document.createElement('div');
+      channelsGrid.className = 'channels-grid';
+
+      // Render channels
+      for (const channel of category.channels) {
+        const card = await createChannelCard(channel);
+        channelsGrid.appendChild(card);
+      }
+
+      folderContent.appendChild(channelsGrid);
+    }
+
+    folderDiv.appendChild(folderContent);
+    container.appendChild(folderDiv);
+  }
+
+  // Update sidebar stats
+  updateSidebarStats(totalChannelCount);
+}
+
+// Create Enhanced Channel Card
+async function createChannelCard(channel) {
+  const card = document.createElement('a');
+  card.className = 'channel-card';
+  card.href = channel.url;
+  card.target = '_blank';
+  card.rel = 'noopener noreferrer';
+
+  // Fetch channel details (cached)
+  const details = await fetchChannelDetails(channel.id);
+
+  // Card content
+  const hasDetails = !!details;
+
+  card.innerHTML = `
+    <div class="channel-header">
+      <div class="channel-avatar">
+        ${hasDetails && details.thumbnail
+      ? `<img src="${details.thumbnail}" alt="${channel.displayName}">`
+      : `<i data-feather="tv"></i>`
+    }
+      </div>
+      <div class="channel-info">
         <div class="channel-name">${channel.displayName}</div>
         <div class="channel-handle">@${channel.handle}</div>
-      `;
+      </div>
+    </div>
+    ${hasDetails && details.description
+      ? `<div class="channel-description">${escapeHtml(details.description.substring(0, 100))}${details.description.length > 100 ? '...' : ''}</div>`
+      : ''
+    }
+    ${hasDetails
+      ? `<div class="channel-stats">
+          <span class="channel-stat">
+            <i data-feather="users"></i> ${formatNumber(details.subscriberCount)}
+          </span>
+          <span class="channel-stat">
+            <i data-feather="video"></i> ${formatNumber(details.videoCount)} videos
+          </span>
+        </div>`
+      : ''
+    }
+  `;
 
-      // Add delete button to ALL channels
-      const deleteBtn = document.createElement('button');
-      deleteBtn.className = 'channel-delete-btn';
-      deleteBtn.innerHTML = '🗑️';
-      deleteBtn.title = 'Remove channel';
-      deleteBtn.setAttribute('aria-label', 'Delete channel');
+  // Replace feather icons
+  setTimeout(() => feather.replace(), 0);
 
-      deleteBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        deleteChannel(channel.id, channel.displayName);
-      });
+  // Add delete button
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'channel-delete-btn';
+  deleteBtn.innerHTML = '🗑️';
+  deleteBtn.title = 'Remove channel';
+  deleteBtn.setAttribute('aria-label', 'Delete channel');
 
-      channelCard.appendChild(deleteBtn);
-
-      channelsGrid.appendChild(channelCard);
-    });
-
-    categoryDiv.appendChild(channelsGrid);
-    container.appendChild(categoryDiv);
+  deleteBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    deleteChannel(channel.id, channel.displayName);
   });
+
+  card.appendChild(deleteBtn);
+
+  return card;
+}
+
+// Update Sidebar Stats
+function updateSidebarStats(channelCount) {
+  const categoryCount = channelsData.filter(cat => cat.channels.length > 0).length;
+
+  document.getElementById('totalChannels').textContent = channelCount;
+  document.getElementById('totalCategories').textContent = categoryCount;
 }
 
 // Create Filter Chips

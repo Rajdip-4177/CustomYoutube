@@ -4,78 +4,136 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description"
-    content="Focused YouTube search for curated educational channels - Physics Wallah. Stay distraction-free while learning.">
+  <meta name="description" content="Focused YouTube search for curated educational channels - Physics Wallah. Stay distraction-free while learning.">
   <title>Focused Learning Hub - Physics Wallah Channels</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
 </head>
 
 <body>
-  <div class="container">
-    <!-- Header -->
-    <header>
-      <h1 class="logo">📚 Focused Learning Hub</h1>
-      <p class="tagline">Your Distraction-Free Gateway to Physics Wallah</p>
-    </header>
-
-    <!-- API Key Section -->
-    <section class="api-key-section" id="apiKeySection">
-      <div class="api-key-input-group">
-        <input type="text" id="apiKeyInput" placeholder="Enter your YouTube API Key" autocomplete="off">
-        <button class="btn btn-primary" id="saveApiKeyBtn">Save Key</button>
-        <button class="btn btn-secondary" id="showInstructionsBtn">How to get API Key?</button>
-        <button class="btn btn-secondary" id="addChannelBtn">Add Channel</button>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="logo-section">
+        <span class="logo-icon">📚</span>
+        <h1 class="logo-text">Focused Learning Hub</h1>
       </div>
-      <div class="api-status">
-        <span class="status-indicator" id="statusIndicator"></span>
-        <span id="statusText">No API key set</span>
+      
+      <!-- Search Bar -->
+      <div class="header-search">
+        <i data-feather="search"></i>
+        <input type="text" id="searchInput" placeholder="Search videos from your curated channels..." autocomplete="off">
       </div>
+    </div>
+  </header>
 
-      <!-- Quota Tracker -->
-      <div class="quota-container" id="quotaContainer"
-        style="display: none; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
-        <div class="quota-header"
-          style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
-          <span>Daily Quota Used <small style="opacity: 0.7;">(Estimated)</small></span>
-          <span id="quotaText">0 / 10,000</span>
-        </div>
-        <div class="progress-bar-bg"
-          style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-          <div class="progress-bar-fill" id="quotaFill"
-            style="width: 0%; height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A); transition: width 0.5s ease; border-radius: 4px;">
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <!-- User Section -->
+      <div class="sidebar-section user-section">
+        <div id="userCard" class="user-card">
+          <div class="user-avatar">
+            <i data-feather="user"></i>
+          </div>
+          <div class="user-info">
+            <div class="user-name">Guest User</div>
+            <button id="loginBtn" class="btn-link">Sign in</button>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- Search Section -->
-    <section class="search-section" id="searchSection">
-      <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="Search videos from your curated channels..."
-          autocomplete="off">
+      <!-- API Key Section -->
+      <div class="sidebar-section">
+        <div class="section-header">
+          <i data-feather="key"></i>
+          <h3>API Configuration</h3>
+        </div>
+        <div class="api-input-group">
+          <input type="password" id="apiKeyInput" placeholder="YouTube API Key" autocomplete="off">
+          <button id="saveApiKeyBtn" class="btn-icon" title="Save API Key">
+            <i data-feather="save"></i>
+          </button>
+        </div>
+        <div class="api-status" id="apiStatus">
+          <div class="status-indicator"></div>
+          <span id="statusText">No API key set</span>
+        </div>
+        <button id="showInstructionsBtn" class="btn-text">
+          <i data-feather="help-circle"></i>
+          How to get API Key?
+        </button>
       </div>
-      <div class="search-filters" id="searchFilters">
-        <!-- Filters will be populated by JavaScript -->
-      </div>
-    </section>
 
-    <!-- Video Results -->
-    <section class="results-section hidden" id="resultsSection">
-      <h2 class="section-title">Search Results</h2>
-      <div class="results-info" id="resultsInfo"></div>
-      <div class="videos-grid" id="videosGrid">
-        <!-- Videos will be populated by JavaScript -->
+      <!-- Stats Section -->
+      <div class="sidebar-section stats-section">
+        <div class="section-header">
+          <i data-feather="bar-chart-2"></i>
+          <h3>Statistics</h3>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-item">
+            <div class="stat-value" id="totalChannels">0</div>
+            <div class="stat-label">Channels</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="totalCategories">0</div>
+            <div class="stat-label">Categories</div>
+          </div>
+        </div>
       </div>
-    </section>
 
-    <!-- Channels Section -->
-    <section class="channels-section" id="channelsSection">
-      <h2 class="section-title">Quick Access to Channels</h2>
-      <div id="categoriesContainer">
-        <!-- Categories and channels will be populated by JavaScript -->
+      <!-- Quota Tracker -->
+      <div class="sidebar-section quota-section" id="quotaSection" style="display: none;">
+        <div class="section-header">
+          <i data-feather="activity"></i>
+          <h3>Daily Quota</h3>
+        </div>
+        <div class="quota-info">
+          <span id="quotaText">0 / 10,000</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="quotaFill"></div>
+        </div>
       </div>
-    </section>
+
+      <!-- Actions -->
+      <div class="sidebar-section">
+        <button id="addChannelBtn" class="btn-primary btn-full">
+          <i data-feather="plus"></i>
+          Add Channel
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Search Results -->
+      <section id="resultsSection" class="results-section hidden">
+        <div class="section-title-bar">
+          <h2>Search Results</h2>
+          <span id="resultsInfo" class="results-count"></span>
+        </div>
+        <div id="videosGrid" class="videos-grid"></div>
+      </section>
+
+      <!-- Channels Section -->
+      <section id="channelsSection" class="channels-section">
+        <div class="section-title-bar">
+          <h2>Your Channels</h2>
+          <div class="view-controls">
+            <button class="btn-icon active" id="viewFolderBtn" title="Folder view">
+              <i data-feather="folder"></i>
+            </button>
+            <button class="btn-icon" id="viewGridBtn" title="Grid view">
+              <i data-feather="grid"></i>
+            </button>
+          </div>
+        </div>
+        <div id="categoriesContainer" class="categories-container"></div>
+      </section>
+    </main>
   </div>
 
   <!-- API Instructions Modal -->
@@ -90,8 +148,7 @@
 
         <h3>Step 1: Go to Google Cloud Console</h3>
         <ol>
-          <li>Visit <a href="https://console.cloud.google.com/" target="_blank" style="color: var(--primary);">Google
-              Cloud Console</a></li>
+          <li>Visit <a href="https://console.cloud.google.com/" target="_blank" style="color: var(--primary);">Google Cloud Console</a></li>
           <li>Sign in with your Google account</li>
         </ol>
 
@@ -116,16 +173,7 @@
           <li>Paste it in the input field above</li>
         </ol>
 
-        <h3>Step 5: (Optional) Restrict Your Key</h3>
-        <ol>
-          <li>Click "Restrict Key" for security</li>
-          <li>Under "API restrictions", select "YouTube Data API v3"</li>
-          <li>Save your changes</li>
-        </ol>
-
-        <p style="margin-top: 1.5rem;"><strong>Note:</strong> The free tier includes 10,000 quota units per day, which
-          is more than enough for personal use. Your API key is stored locally in your browser and never sent anywhere
-          except to YouTube.</p>
+        <p style="margin-top: 1.5rem;"><strong>Note:</strong> The free tier includes 10,000 quota units per day.</p>
       </div>
     </div>
   </div>
@@ -139,20 +187,14 @@
       </div>
       <div class="modal-body">
         <div class="input-group">
-          <label for="channelUrl" style="display: block; margin-bottom: 0.5rem; color: var(--text-primary);">Channel
-            Link</label>
-          <input type="text" id="channelUrl" placeholder="https://youtube.com/@handle"
-            style="width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 0.5rem; margin-bottom: 1rem; background: var(--bg-primary); color: var(--text-primary); border-color: rgba(255,255,255,0.1);">
+          <label for="channelUrl">Channel Link</label>
+          <input type="text" id="channelUrl" placeholder="https://youtube.com/@handle">
         </div>
         <div class="input-group">
-          <label for="channelCategory"
-            style="display: block; margin-bottom: 0.5rem; color: var(--text-primary);">Category</label>
-          <select id="channelCategory"
-            style="width: 100%; padding: 0.8rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; margin-bottom: 1.5rem; background: var(--bg-primary); color: var(--text-primary);">
-            <!-- Options populated by JS -->
-          </select>
+          <label for="channelCategory">Category</label>
+          <select id="channelCategory"></select>
         </div>
-        <button class="btn btn-primary" id="confirmAddChannelBtn" style="width: 100%;">Add Channel</button>
+        <button class="btn-primary btn-full" id="confirmAddChannelBtn">Add Channel</button>
       </div>
     </div>
   </div>
@@ -165,16 +207,20 @@
         <button class="close-btn" id="closeDeleteModalBtn">&times;</button>
       </div>
       <div class="modal-body">
-        <p id="deleteConfirmMessage" style="margin-bottom: 1.5rem; color: var(--text-primary);"></p>
+        <p id="deleteConfirmMessage" style="margin-bottom: 1.5rem;"></p>
         <div style="display: flex; gap: 1rem;">
-          <button class="btn btn-secondary" id="cancelDeleteBtn" style="flex: 1;">Cancel</button>
-          <button class="btn" id="confirmDeleteBtn" style="flex: 1; background: #f44336; color: white;">Remove</button>
+          <button class="btn-secondary" id="cancelDeleteBtn" style="flex: 1;">Cancel</button>
+          <button class="btn-danger" id="confirmDeleteBtn" style="flex: 1;">Remove</button>
         </div>
       </div>
     </div>
   </div>
 
   <script src="app.js"></script>
+  <script>
+    // Initialize Feather Icons
+    feather.replace();
+  </script>
 </body>
 
 </html>
