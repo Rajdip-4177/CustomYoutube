@@ -48,28 +48,6 @@
         </div>
       </div>
 
-      <!-- API Key Section -->
-      <div class="sidebar-section">
-        <div class="section-header">
-          <i data-feather="key"></i>
-          <h3>API Configuration</h3>
-        </div>
-        <div class="api-input-group">
-          <input type="password" id="apiKeyInput" placeholder="YouTube API Key" autocomplete="off">
-          <button id="saveApiKeyBtn" class="btn-icon" title="Save API Key">
-            <i data-feather="save"></i>
-          </button>
-        </div>
-        <div class="api-status" id="apiStatus">
-          <div class="status-indicator"></div>
-          <span id="statusText">No API key set</span>
-        </div>
-        <button id="showInstructionsBtn" class="btn-text">
-          <i data-feather="help-circle"></i>
-          How to get API Key?
-        </button>
-      </div>
-
       <!-- Stats Section -->
       <div class="sidebar-section stats-section">
         <div class="section-header">
@@ -113,6 +91,34 @@
 
     <!-- Main Content -->
     <main class="main-content">
+      <!-- API Key Panel -->
+      <div class="api-key-panel" id="apiKeyPanel">
+        <div class="api-key-header">
+          <div class="api-key-icon">
+            <i data-feather="key"></i>
+          </div>
+          <div class="api-key-info">
+            <h3>YouTube API Key Required</h3>
+            <p>Enter your API key to unlock video search</p>
+          </div>
+        </div>
+        <div class="api-key-actions">
+          <input type="password" id="apiKeyInput" placeholder="Paste your YouTube Data API v3 Key" autocomplete="off">
+          <button id="saveApiKeyBtn" class="btn-primary btn-compact">
+            <i data-feather="save"></i>
+            Save
+          </button>
+          <button id="showInstructionsBtn" class="btn-link-compact">
+            <i data-feather="help-circle"></i>
+            Get API Key
+          </button>
+        </div>
+        <div class="api-status-banner" id="apiStatus">
+          <div class="status-indicator"></div>
+          <span id="statusText">No API key configured</span>
+        </div>
+      </div>
+
       <!-- Search Panel -->
       <div class="search-panel">
         <i data-feather="search"></i>
@@ -229,6 +235,7 @@
   </div>
 
   <script src="app.js"></script>
+  <script src="sidebar-toggle.js"></script>
   <script>
     // Initialize Feather Icons
     feather.replace();
