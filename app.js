@@ -178,6 +178,31 @@ function loadChannelsData() {
   populateCategoryDropdown();
 }
 
+// Delete Channel
+function deleteChannel(channelId, categoryName) {
+  // Find the channel to get its name for confirmation
+  const channelToDelete = customChannels.find(ch => ch.id === channelId);
+
+  if (!channelToDelete) {
+    console.error('Channel not found');
+    return;
+  }
+
+  const confirmMessage = `Are you sure you want to remove "${channelToDelete.displayName}"?`;
+
+  if (confirm(confirmMessage)) {
+    // Remove from customChannels array
+    customChannels = customChannels.filter(ch => ch.id !== channelId);
+
+    // Update localStorage
+    localStorage.setItem('customChannels', JSON.stringify(customChannels));
+
+    // Reload data to refresh UI
+    loadChannelsData();
+  }
+}
+
+
 function populateCategoryDropdown() {
   const select = document.getElementById('channelCategory');
   if (!select) return;
@@ -466,6 +491,23 @@ function displayChannels() {
         <div class="channel-name">${channel.displayName}</div>
         <div class="channel-handle">@${channel.handle}</div>
       `;
+
+      // Add delete button for custom channels only
+      if (channel.isCustom) {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'channel-delete-btn';
+        deleteBtn.innerHTML = '🗑️';
+        deleteBtn.title = 'Remove channel';
+        deleteBtn.setAttribute('aria-label', 'Delete channel');
+
+        deleteBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          deleteChannel(channel.id, category.name);
+        });
+
+        channelCard.appendChild(deleteBtn);
+      }
 
       channelsGrid.appendChild(channelCard);
     });
